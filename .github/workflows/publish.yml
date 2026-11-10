@@ -1,0 +1,28 @@
+# GitHub Actions workflow for publishing backend packages
+
+name: Publish Backend Catalog
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Upload backend assets to release
+        run: |
+          # Backend ZIPs are attached to the release via the GitHub web UI
+          # or gh CLI. This workflow validates the manifest and publishes
+          # the catalog to GitHub Pages.
+          echo "Validating manifest.json..."
+          python3 -c "import json; json.load(open('manifest.json'))"
+          echo "Manifest is valid JSON."
+
+      - name: Deploy catalog to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
